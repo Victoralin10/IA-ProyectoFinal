@@ -5,6 +5,7 @@ $(document).ready(() => {
         j03: "Helmer Huerta",
         j04: "Guillermo Rossinni",
         j05: "Hector Felipe",
+        j06: "Patricia del Rio",
         jxx: "Otro"
     };
 

@@ -3,14 +3,13 @@
 import os
 import argparse
 import re
-import datetime
 import multiprocessing
 import sys
 
 from pydub import AudioSegment
 
 
-def get_audio_files(path, stations=None, days=None, hours=None):
+def get_audio_files(path, stations, ts, te):
     if not os.path.exists(path):
         raise Exception('Source folder not found')
 
@@ -25,10 +24,8 @@ def get_audio_files(path, stations=None, days=None, hours=None):
             return False
         if stations and p[0] not in stations:
             return False
-        date = datetime.datetime.fromtimestamp(int(p[1]))
-        if days and str(date.weekday()) not in days:
-            return False
-        if hours and date.hour not in hours:
+        t = int(p[1])
+        if t < ts or t > te:
             return False
         return True
 
@@ -71,7 +68,7 @@ def worker(_id, queue_in, queue_out, dest, duration):
 
 def run(args):
     print('Listing audio files...')
-    files = get_audio_files(args.source, stations=args.f_stations, days=args.f_day, hours=args.f_hour)
+    files = get_audio_files(args.source, args.f_stations, args.timestamp_start, args.timestamp_end)
     print(len(files), 'audio files found.')
     print('Loading tasks to queue.')
 
@@ -96,8 +93,10 @@ def run(args):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-fs', '--f_stations', action='append', type=str)
-    parser.add_argument('-fd', '--f_day', type=str)
-    parser.add_argument('-fh', '--f_hour', type=int, action='append')
+
+    parser.add_argument('--timestamp_start', '-ts', type=int, help='Timestamp start limit', default=0)
+    parser.add_argument('--timestamp_end', '-te', type=int, help='Timestamp end limit', default=int(1e16))
+
     parser.add_argument('-d', '--duration', type=int, default=2)
     parser.add_argument('source', type=str)
     parser.add_argument('dest', type=str)
