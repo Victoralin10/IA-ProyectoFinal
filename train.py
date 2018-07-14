@@ -6,6 +6,7 @@ import csv
 import argparse
 import matplotlib.pyplot as plt
 import os
+import random
 
 
 def load_data_set(f_csv):
@@ -13,14 +14,42 @@ def load_data_set(f_csv):
         print('Csv Data-Set not found.')
         return
 
-    features, labels = [], []
-
+    rows = []
     with open(f_csv) as f:
         csv_in = csv.reader(f)
         csv_in.__next__()
         for row in csv_in:
-            features.append(row[2:])
-            labels.append(row[1])
+            rows.append(row[1:])
+
+    def order(a):
+        return a[0]
+
+    rows = sorted(rows, key=order)
+    rows.append(['end'])
+
+    prev = '-1'
+    n_rows, tmp = [], []
+
+    def handle_group(group):
+        cp_group = group.copy()
+        while len(group) < 500:
+            group.extend(cp_group.copy())
+        n_rows.extend(group)
+
+    for row in rows:
+        if row[0] == prev:
+            tmp.append(row)
+        else:
+            if len(tmp) > 0:
+                handle_group(tmp)
+            tmp = [row]
+        prev = row[0]
+
+    random.shuffle(n_rows)
+    features, labels = [], []
+    for row in n_rows:
+        labels.append(row[0])
+        features.append(row[1:])
     return features, labels
 
 
@@ -61,10 +90,13 @@ def make_model(tr_features, tr_labels, ts_features, ts_labels, training_epochs, 
         for epoch in range(training_epochs):
             _, cost = sess.run([optimizer, cost_function], feed_dict={x: tr_features, y: tr_labels})
             cost_history = np.append(cost_history, cost)
+            print('\r', int(epoch*100.0/training_epochs), '% completed', end='')
+        print('\rTraining completed.')
+
         # print(sess.run(b))
         # y_pred = sess.run(tf.argmax(y_, 1), feed_dict={X: ts_features})
         # y_true = sess.run(tf.argmax(ts_labels, 1))
-        print("Train accuracy", round(sess.run(accuracy, feed_dict={x: tr_features, y: tr_labels}), 3))
+        print("Train accuracy: ", round(sess.run(accuracy, feed_dict={x: tr_features, y: tr_labels}), 3))
         print("Test accuracy: ", round(sess.run(accuracy, feed_dict={x: ts_features, y: ts_labels}), 3))
 
     # fig = plt.figure(figsize=(10, 8))
