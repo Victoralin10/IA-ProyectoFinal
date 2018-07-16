@@ -179,5 +179,6 @@ venv.bak/
 
 # End of https://www.gitignore.io/api/python,pycharm+all
 
-/data
-/samples
+/data/*.mp3
+/data/*.ogg
+/samples/*.mp3
