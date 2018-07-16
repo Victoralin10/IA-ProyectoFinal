@@ -8,6 +8,7 @@ import csv
 select_query = """
 select id, tag from `{table}`
 where tag is not null
+order by tag
 """
 
 

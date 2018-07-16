@@ -89,7 +89,6 @@ def parse_args():
     required_args.add_argument('--tags_csv', '-i', type=str, help='Csv file containing tags', required=True)
     required_args.add_argument('--samples', '-s', type=str, help='Directory containing audio samples', required=True)
     parser.add_argument('--out_csv', '-o', type=str, default='data-set.csv', help='Output csv file')
-
     return parser.parse_args()
 
 

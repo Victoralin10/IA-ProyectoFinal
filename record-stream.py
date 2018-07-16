@@ -23,6 +23,14 @@ def record_interval(stop_rec, stream_url, target_dir, station, interval):
     elif content_type != "audio/mpeg":
         print('Unknown content type "' + content_type + '". Assuming mp3.')
 
+    # Ignoring buffered content
+    timestamp = datetime.datetime.now().timestamp()
+    timestamp = math.floor(timestamp + 0.5)
+
+    while not conn.close and datetime.datetime.now().timestamp() - timestamp < 2:
+        conn.read(1024)
+
+    # Start recording
     timestamp = datetime.datetime.now().timestamp()
     timestamp = math.floor(timestamp + 0.5)
 
@@ -33,7 +41,9 @@ def record_interval(stop_rec, stream_url, target_dir, station, interval):
             target.write(conn.read(1024))
 
     conn.close()
-    os.rename(tmp_filename, filename + str(timestamp) + file_extension)
+    filename = filename + str(timestamp) + file_extension
+    os.rename(tmp_filename, filename)
+    return filename
 
 
 def record_worker(stop_rec, stream_url, target_dir, station, interval):
