@@ -8,23 +8,26 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/files', (req, res, next) => {
-    fs.readdir(path.join(__dirname, '..', 'public', 'data'), (err , files) => {
+    fs.readdir(path.join(__dirname, '..', 'public', 'data'), (err, files) => {
         if (err) {
             return res.send({success: false});
         }
 
-        files = files.sort().map(file => {
-            let tm = file.split('.')[0];
-            let i = 0;
-            while (tm[i] < '0' || tm[i] > '9') i++;
-            tm = tm.substr(i);
-            tm = parseInt(tm)*1000;
+        files = files
+            .sort()
+            .filter(file => file.split('.')[1] === 'mp3')
+            .map(file => {
+                let tm = file.split('.')[0];
+                let i = 0;
+                while (tm[i] < '0' || tm[i] > '9') i++;
+                tm = tm.substr(i);
+                tm = parseInt(tm) * 1000;
 
-            return {
-                file_name: file,
-                timestamp: tm
-            };
-        });
+                return {
+                    file_name: file,
+                    timestamp: tm
+                };
+            });
 
         res.json({success: true, data: files});
     });
