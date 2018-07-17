@@ -8,8 +8,8 @@ import threading
 import json
 
 
-am = importlib.import_module('apply-model')
-rs = importlib.import_module('record-stream')
+am = importlib.import_module('s7-apply-model')
+rs = importlib.import_module('s1-record-stream')
 
 
 def load_tags():

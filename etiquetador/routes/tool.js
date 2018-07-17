@@ -14,7 +14,10 @@ router.get('/files', (req, res, next) => {
         }
 
         files = files.sort().map(file => {
-            let tm = file.split('.')[0].substr(3);
+            let tm = file.split('.')[0];
+            let i = 0;
+            while (tm[i] < '0' || tm[i] > '9') i++;
+            tm = tm.substr(i);
             tm = parseInt(tm)*1000;
 
             return {
